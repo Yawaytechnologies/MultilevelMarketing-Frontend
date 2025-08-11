@@ -1,10 +1,20 @@
-import React from "react";
-import Hero from "../components/home/Hero";
+// src/pages/Home.jsx
+import Hero from "../components/home/Landing";
+import Header from "../components/common/Header";
+import Carousel from "../components/home/Carousel";
+import AboutMlm from "../components/home/About";
+
 export default function Home() {
   return (
-    <div>
-      <h1 class="text-3xl bg-green-600  font-bold underline">Hello world!</h1>
+    <>
       <Hero />
-    </div>
+      {/* attaches under hero; sticks to top when reached */}
+      <Header mode="sticky" />
+
+      <main id="content-start"  >
+       <Carousel />
+       <AboutMlm />
+      </main>
+    </>
   );
 }
