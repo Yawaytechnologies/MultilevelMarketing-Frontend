@@ -10,23 +10,11 @@ export default function HeroCarousel() {
   const slides = [
     {
       image: Homecare,
-      subtitle: "We Are",
-      title: (
-        <>
-          LAKSH<span className="text-[#FF6B2B]">RA</span>
-        </>
-      ),
-      ctaLabel: "Join Now",
-      ctaHref: "/joinus",
-      align: "center",
+      
     },
     {
       image: Skincare,
-      subtitle: "Multi Level Marketing",
-      title: "Grow your network. Grow your income.",
-      ctaLabel: "Explore Products",
-      ctaHref: "/products",
-      align: "left",
+     
     },
   ];
 
@@ -111,19 +99,11 @@ export default function HeroCarousel() {
 function Slide({
   active,
   image,
-  title,
-  subtitle,
-  ctaLabel,
-  ctaHref,
-  align = "center",
-  tintHex,
+
+  
+  
 }) {
-  const alignCls =
-    align === "left"
-      ? "items-start text-left"
-      : align === "right"
-      ? "items-end text-right"
-      : "items-center text-center";
+ 
 
   return (
     <div
