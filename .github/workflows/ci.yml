@@ -12,15 +12,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'  # Use LTS for best support
+          node-version: '20'
 
       - name: Cache NPM cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -38,21 +38,32 @@ jobs:
 
   auto-merge:
     needs: frontend-checks
-    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'develop'
+    # Only on PRs targeting develop and not drafts
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
       pull-requests: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    env:
+      # change to squash/rebase if you prefer
+      MERGE_METHOD: merge
 
-      - name: Enable auto-merge for PR
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.AUTO_MERGE_TOKEN }}
-          repository: ${{ github.repository }}
-          pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: merge
+    steps:
+      # gh is preinstalled on ubuntu-latest; no checkout required
+      - name: Set PR number
+        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Enable auto-merge via gh
+        env:
+          GH_TOKEN: ${{ github.token }}   # <-- required for gh auth
+        run: |
+          case "$MERGE_METHOD" in
+            merge|squash|rebase) ;;
+            *) echo "Invalid MERGE_METHOD: $MERGE_METHOD"; exit 1 ;;
+          esac
+          gh pr merge -R "${{ github.repository }}" \
+            --"$MERGE_METHOD" \
+            --auto \
+            "$PR_NUMBER"
