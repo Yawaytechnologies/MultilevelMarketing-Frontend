@@ -18,7 +18,7 @@ const scrollToContent = () => {
       }}
     >
       {/* stronger overlay on mobile for contrast */}
-      <div className="absolute inset-0 bg-black/40 md:bg-black/40" />
+      <div className="absolute inset-0 bg-black/40 md:bg-black/10" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
       {/* subtle dot grid suggesting a network */}
@@ -29,7 +29,7 @@ const scrollToContent = () => {
       />
 
       {/* panel */}
-      <div className="relative z-10 w-[94%] sm:w-[92%] max-w-5xl px-5 sm:px-10 py-10 sm:py-16 bg-black/70">
+      <div className="relative z-10 w-[94%] sm:w-[92%] max-w-5xl px-5 sm:px-10 py-10 sm:py-16 bg-black/50">
         {/* WE ARE + lines */}
         <div
           className="flex items-center justify-center gap-3 sm:gap-5 text-[0.75rem] sm:text-[0.85rem] tracking-[0.25em] sm:tracking-[0.35em] uppercase"

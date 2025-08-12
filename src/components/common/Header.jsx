@@ -42,7 +42,7 @@ export default function HeaderKoyeb({ mode = "sticky" }) {
           <nav className="hidden lg:block flex-1">
             <ul
               className="mx-auto w-fit flex items-center gap-8
-                         rounded-2xl bg-neutral-300/60 px-5 py-3
+                         rounded-2xl bg-white px-5 py-3
                          ring-1 ring-neutral-500/20 shadow-inner
                           tracking-[0.18em] text-[15px] text-black/85 uppercase"
             >

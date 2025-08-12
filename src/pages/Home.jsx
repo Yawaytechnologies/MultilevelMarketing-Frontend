@@ -3,7 +3,8 @@ import Hero from "../components/home/Landing";
 import Header from "../components/common/Header";
 import Carousel from "../components/home/Carousel";
 import AboutMlm from "../components/home/About";
-
+import DiscoverProducts from "../components/home/DiscoverProducts";
+import OurStory from "../components/home/OurStory";
 export default function Home() {
   return (
     <>
@@ -14,6 +15,9 @@ export default function Home() {
       <main id="content-start"  >
        <Carousel />
        <AboutMlm />
+       <DiscoverProducts />
+        <OurStory />
+        
       </main>
     </>
   );
