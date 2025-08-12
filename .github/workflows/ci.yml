@@ -42,9 +42,11 @@ jobs:
       group: automerge-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     steps:
-      - name: Enable auto-merge for PR
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.AUTO_MERGE_TOKEN }}  # PAT with Contents & Pull requests: write
-          pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: merge
+      - name: Set PR number
+        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Auto-merge with gh
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Use the PAT or default GITHUB_TOKEN
+        run: |
+          gh pr merge -R "${{ github.repository }}" --merge --auto "$PR_NUMBER"
