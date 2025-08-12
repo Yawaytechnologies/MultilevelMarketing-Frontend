@@ -10,7 +10,7 @@ export default function AboutMlm() {
         [background-image:radial-gradient(#000_1px,transparent_1px)]
         [background-size:18px_18px]" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-9 sm:pt-21 pb-16 sm:pb-24">
         {/* Eyebrow */}
         <div className="flex items-center justify-center gap-3 uppercase tracking-[0.25em] text-xs sm:text-sm">
           <span className="h-px w-10 bg-neutral-300" />

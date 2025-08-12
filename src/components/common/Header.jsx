@@ -16,7 +16,7 @@ export default function HeaderKoyeb({ mode = "sticky" }) {
     mode === "sticky" ? "sticky top-0 z-50" : "fixed inset-x-0 top-0 z-50";
 
   return (
-    <header className={wrapper}>
+     <header data-app-header className={wrapper}>
       {/* page bg bar (light linen vibe) */}
       <div className="w-full bg-[#f3d7cbbf] text-white backdrop-blur-md border-b border-white/15">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
@@ -42,7 +42,7 @@ export default function HeaderKoyeb({ mode = "sticky" }) {
           <nav className="hidden lg:block flex-1">
             <ul
               className="mx-auto w-fit flex items-center gap-8
-                         rounded-2xl bg-neutral-300/60 px-5 py-3
+                         rounded-2xl bg-white px-5 py-3
                          ring-1 ring-neutral-500/20 shadow-inner
                           tracking-[0.18em] text-[15px] text-black/85 uppercase"
             >
