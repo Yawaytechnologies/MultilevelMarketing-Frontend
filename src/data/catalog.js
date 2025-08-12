@@ -1,6 +1,6 @@
 // src/data/catalog.js
 import proteinImg from "../assets/protien.jpg";
-import herbalImg from "../assets/Herball.jpg";
+import herbalImg from "../assets/herball.jpg";
 import skincareImg from "../assets/skincare.jpg";
 import laundryImg from "../assets/cleaner.jpg";
 import vedhaImg from "../assets/vedha.jpg";
