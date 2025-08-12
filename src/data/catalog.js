@@ -5,7 +5,7 @@ import skincareImg from "../assets/skincare.jpg";
 import laundryImg from "../assets/cleaner.jpg";
 import vedhaImg from "../assets/vedha.jpg";
 import omega3Img from "../assets/omega3.jpg";
-
+                   
 
 
 export const CATEGORIES = ["All", "Wellness", "Beauty", "Home Care", "Nutrition", "Personal Care"];
