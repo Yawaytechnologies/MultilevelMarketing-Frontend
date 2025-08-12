@@ -3,8 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Hero from "../components/product/Hero";
 import SearchFilters from "../components/product/SearchFilters";
-import CategoryStrip from "../components/product/CategoryStrip";
-import ProductGrid from "../components/product/ProductGrid";
+import ProductGrid from "../components/product/ProductGrid"; // <-- dark grid/cards
 import BestSellers from "../components/product/BestSellers";
 import JoinAndSaveCTA from "../components/product/JoinAndSaveCTA";
 import HowItWorks from "../components/product/HowItWorks";
@@ -31,13 +30,11 @@ export default function ProductPage() {
     );
   }, [activeCat, query]);
 
-  const addToCart = (prod) => {
-    // TODO: replace with Redux/Context or API call
-    alert(`Added to cart: ${prod.title}`);
-  };
+  const addToCart = (prod) => alert(`Added to cart: ${prod.title}`);
 
   return (
-    <div className="bg-white text-slate-900">
+    // ↓ dark shell
+    <div className="bg-slate-950 text-slate-100">
       <title>Products | Direct Selling • Wellness • Beauty • Home Care</title>
       <meta
         name="description"
@@ -46,7 +43,7 @@ export default function ProductPage() {
 
       <Hero />
 
-      {/* Search + Filter Buttons */}
+      {/* Search + Filter */}
       <SearchFilters
         categories={CATEGORIES}
         active={activeCat}
@@ -55,21 +52,23 @@ export default function ProductPage() {
         onQuery={setQuery}
       />
 
-      {/* Breadcrumbs (kept simple, optional to extract) */}
-      <nav className="mt-6 text-sm text-slate-500 px-6 max-w-6xl mx-auto" aria-label="Breadcrumb">
+      {/* Breadcrumbs */}
+      <nav className="mt-6 text-sm text-slate-400 px-6 max-w-6xl mx-auto" aria-label="Breadcrumb">
         <ol className="inline-flex gap-2">
           <li>
-            <Link to="/" className="hover:underline">
+            <Link to="/" className="hover:underline text-slate-300">
               Home
             </Link>
           </li>
           <li aria-hidden>›</li>
-          <li className="text-slate-700">Products</li>
+          <li className="text-slate-200">Products</li>
         </ol>
       </nav>
 
-      <CategoryStrip categories={CATEGORIES} active={activeCat} onCategory={setActiveCat} />
+      {/* Dark cards grid */}
       <ProductGrid items={filtered} onAdd={addToCart} />
+
+      {/* If these sections are light, give them dark classes inside their components. */}
       <BestSellers products={PRODUCTS} ids={BEST_SELLER_IDS} onAdd={addToCart} />
       <JoinAndSaveCTA />
       <HowItWorks />

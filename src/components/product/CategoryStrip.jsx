@@ -8,7 +8,14 @@ export default function CategoryStrip({
   showAll = true,
   sticky = true,
 }) {
-  const items = showAll ? ["All", ...categories.filter(Boolean)] : categories.filter((c) => c !== "All");
+  // ✅ Build unique category list (no duplicate "All" or other duplicates)
+  const items = Array.from(
+    new Set(
+      (showAll ? ["All", ...categories] : categories)
+        .filter(Boolean) // remove null/undefined/empty
+        .filter((c) => (showAll ? true : c !== "All")) // hide "All" if showAll is false
+    )
+  );
 
   return (
     <section
@@ -19,7 +26,7 @@ export default function CategoryStrip({
     >
       <div className="rounded-2xl border border-white/10 bg-[#0b0b0f]/80 backdrop-blur supports-[backdrop-filter]:bg-[#0b0b0f]/60 shadow-lg">
         <div className="flex items-center gap-3 px-3 sm:px-4 py-3 sm:py-4">
-          {/* Label (like Search Filters header) */}
+          {/* Label (desktop only) */}
           <span className="hidden md:inline text-sm font-medium text-slate-300">
             Filters
           </span>
@@ -35,7 +42,7 @@ export default function CategoryStrip({
                 const isActive = active === c || (!active && c === "All");
                 return (
                   <button
-                    key={c}
+                    key={`cat-${c}`} // ✅ unique key prefix
                     onClick={() => onCategory?.(c)}
                     role="tab"
                     aria-pressed={isActive}
@@ -59,7 +66,7 @@ export default function CategoryStrip({
             </div>
           </div>
 
-          {/* Clear button (aligns with search filter UIs) */}
+          {/* Clear button */}
           {active && active !== "All" ? (
             <button
               onClick={() => onCategory?.("All")}

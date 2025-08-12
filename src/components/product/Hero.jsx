@@ -14,23 +14,23 @@ import sunscreen1 from "../../../src/assets/sunscreen1.svg";
 export default function Home() {
     const rightRail = [
         {
-    img: wellness1,
-    title: "Wellness & Nutrition",
-    caption: "Proteins • Omega • Herbal Support",
-    to: "/category/wellness",
-  },{
-  img: sunscreen1,
-  title: "Skin Care & Beauty",
-  caption: "Day Cream • Serum • Lip Color",
-  to: "/category/beauty",
-}
+            img: wellness1,
+            title: "Wellness & Nutrition",
+            caption: "Proteins • Omega • Herbal Support",
+            to: "/category/wellness",
+        }, {
+            img: sunscreen1,
+            title: "Skin Care & Beauty",
+            caption: "Day Cream • Serum • Lip Color",
+            to: "/category/beauty",
+        }
     ];
 
     return (
         <div className="min-h-screen bg-neutral-950 text-white">
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
                 {/* Premium container */}
-                <section className="relative overflow-hidden rounded-[32px] bg-[radial-gradient(1200px_600px_at_30%_-20%,#ffb781_0%,rgba(255,120,60,0.6)_30%,rgba(32,14,2,0.8)_70%),linear-gradient(180deg,#7a2a06_0%,#3a1506_100%)] ring-1 ring-white/10">
+                <section className="relative overflow-hidden rounded-[32px] bg-[radial-gradient(1200px_600px_at_30%_-20%,#ffb781_0%,rgba(255,120,60,0.6)_30%,rgba(32,14,2,0.8)_70%),linear-gradient(180deg,#7a2a06_0%,#3a1506_100%)] ring-1 ring-white/10 mt-12">
                     {/* subtle grid overlay */}
                     <div className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(transparent,black)]">
                         <svg className="absolute inset-0 h-full w-full opacity-[0.08]" xmlns="http://www.w3.org/2000/svg">
@@ -43,28 +43,7 @@ export default function Home() {
                         </svg>
                     </div>
 
-                    {/* Top bar */}
-                    <header className="flex items-center justify-between gap-6 px-6 md:px-10 py-6">
-                        <div className="flex items-center gap-3">
-                            <div className="h-7 w-7 rounded-md bg-white/90 text-amber-900 grid place-items-center font-black">M</div>
-                            <span className="font-semibold tracking-wide">ModernCare</span>
-                        </div>
 
-                        <nav className="hidden md:flex items-center gap-8 text-sm text-white/85">
-                            <Link to="/category/wellness" className="hover:text-white">Wellness</Link>
-                            <Link to="/category/nutrition" className="hover:text-white">Nutrition</Link>
-                            <Link to="/category/beauty" className="hover:text-white">Skin Care & Beauty</Link>
-                            <Link to="/category/homecare" className="hover:text-white">Home Care</Link>
-                            <Link to="/category/personal" className="hover:text-white">Personal Care</Link>
-                            <Link to="/category/hygiene" className="hover:text-white">Hygiene</Link>
-                        </nav>
-
-                        <div className="flex items-center gap-3">
-                            <Link to="/catalog" className="rounded-lg border border-white/40 px-4 py-2 text-sm hover:bg-white/10">
-                                View Catalogue
-                            </Link>
-                        </div>
-                    </header>
 
                     {/* Content grid */}
                     <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-0 px-6 md:px-10 pb-10">
@@ -77,41 +56,78 @@ export default function Home() {
                         </div>
 
                         {/* Center hero */}
-                        <div className="lg:col-span-5 xl:col-span-6 relative min-h-[360px] md:min-h-[460px] flex items-center">
-                            <div className="relative w-full">
-                                <h1 className="font-serif leading-[0.95] font-medium tracking-tight text-5xl md:text-7xl text-white/90 -ml-4">
-  <span className="block">Everyday</span>
-  <span className="block">Essentials,</span>
-  <span className="block">
-    <span className="text-white font-semibold">Elevated</span>
-  </span>
-</h1>
+                        <div className="lg:col-span-5 xl:col-span-6 relative min-h-[380px] md:min-h-[500px] flex items-end justify-start">
+
+                            {/* make the whole block a hover group */}
+                            <div className="relative w-full group">
+                                {/* Headline: pull further left into the dark zone */}
+                                <h1
+                                    className="
+        font-serif leading-[0.95] font-medium tracking-tight
+        text-5xl md:text-7xl text-white/90
+        -ml-6 md:-ml-10 lg:-ml-16 xl:-ml-24 2xl:-ml-28   /* ← shift left */
+        max-w-[12ch] 
+         -translate-y-16 
+      "
+                                >
+                                    <span className="block">Everyday</span>
+                                    <span className="block">Essentials,</span>
+                                    <span className="block">
+                                        <span className="font-semibold" style={{ color: '#FF6B2B' }}>
+                                            Elevated
+                                        </span>
+
+                                    </span>
+                                </h1>
+
+                                {/* Glow behind the product (animates on hover) */}
+                                <div
+                                    className="
+        pointer-events-none absolute right-[6%] top-1/2 -translate-y-1/2
+        h-[55%] w-[55%] md:h-[65%] md:w-[65%]
+        rounded-full blur-3xl opacity-20
+        bg-[radial-gradient(closest-side,rgba(255,200,140,0.35),transparent)]
+        transition-opacity duration-500
+        group-hover:opacity-35
+      "
+                                />
 
 
 
                                 {/* Product hero image */}
-                                <img
-                                    src={heroMain} // your imported PNG
-                                    alt="Assorted wellness, beauty, and home care products"
-                                    className="
-  select-none pointer-events-none
-  absolute right-[-4%] top-1/2 -translate-y-1/2
-  w-[62%] max-w-[700px]
-  hidden md:block
-  drop-shadow-[0_30px_40px_rgba(0,0,0,0.55)]
-  object-contain"
-            />
+                                <div className="relative group">
+                                    <img
+                                        src={heroMain}
+                                        alt="Assorted wellness, beauty, and home care products"
+                                        className="
+      select-none pointer-events-none
+      absolute right-[-2%] md:right-[-3%] xl:right-[-4%]
+       top-1/2 -translate-y-[75%]
+      w-[68%] md:w-[72%] xl:w-[76%]
+      max-w-[820px]
+      drop-shadow-[0_35px_50px_rgba(0,0,0,0.55)]
+      object-contain
+      transition-transform duration-700 ease-out will-change-transform
+      group-hover:scale-[1.06] group-hover:-rotate-[1.2deg]
+      
+    "
+                                    />
+                                </div>
+
+
+
 
                                 {/* CTAs (mobile-first) */}
-                                <div className="mt-6 flex gap-3">
+                                <div className="mt-6 relative -top-14 -left-[17%] flex gap-3">
+
                                     <Link
-                                        to="/productpage"
-                                        className="rounded-xl px-5 py-3 bg-white text-slate-900 font-medium hover:bg-white/90"
+                                        to="/"
+                                        className="rounded-xl px-5 py-3 bg-white text-slate-900 font-medium hover:bg-[#FF6B2B] hover:text-white transition-colors duration-300"
                                     >
                                         Shop Now
                                     </Link>
                                     <Link
-                                        to="/join"
+                                        to="/"
                                         className="rounded-xl px-5 py-3 border border-white/40 hover:bg-white/10"
                                     >
                                         Join & Save
@@ -120,6 +136,7 @@ export default function Home() {
                             </div>
                         </div>
 
+                        {/* Right rail: categories/products */}
                         {/* Right rail: categories/products */}
                         <aside className="lg:col-span-3 xl:col-span-3 py-6 md:py-10">
                             <p className="text-white/80 text-sm mb-6 max-w-xs">
@@ -136,21 +153,61 @@ export default function Home() {
                                     <Link
                                         key={c.title}
                                         to={c.to}
-                                        className="relative overflow-hidden rounded-xl bg-black/30 ring-1 ring-white/10 group"
+                                        className="
+          group relative overflow-hidden rounded-xl
+          bg-black/30 ring-1 ring-white/10
+          transition-all duration-300 ease-out
+          hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)]
+          hover:ring-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40
+        "
                                     >
+                                        {/* Image with gentle zoom */}
                                         <img
                                             src={c.img}
                                             alt={c.title}
-                                            className="h-40 w-full object-cover opacity-90 group-hover:opacity-100 transition"
+                                            className="
+            h-40 w-full object-cover opacity-90
+            transition-transform duration-500 ease-out
+            group-hover:scale-[1.06] group-hover:opacity-100
+          "
                                         />
-                                        <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                                            <div className="text-xs">{c.caption}</div>
-                                            <div className="text-sm font-medium">{c.title}</div>
+
+                                        {/* Bottom gradient & text */}
+                                        <div className="
+          pointer-events-none absolute inset-x-0 bottom-0 p-2
+          bg-gradient-to-t from-black/70 via-black/20 to-transparent
+          transition-opacity duration-300
+          group-hover:from-black/80
+        ">
+                                            <div className="text-xs text-white/80">{c.caption}</div>
+                                            <div className="text-sm font-medium text-white">{c.title}</div>
                                         </div>
+
+                                        {/* Soft glow on hover */}
+                                        <div
+                                            className="
+            pointer-events-none absolute inset-0 opacity-0
+            group-hover:opacity-100 transition-opacity duration-300
+            [box-shadow:inset_0_0_0_1px_rgba(255,255,255,0.08)]
+          "
+                                        />
+
+                                        {/* Subtle moving sheen */}
+                                        <span
+                                            className="
+            pointer-events-none absolute -left-1/5 top-0 h-full w-1/3
+            translate-x-[-160%] rotate-6
+            bg-gradient-to-r from-transparent via-white/20 to-transparent
+            opacity-0 group-hover:opacity-100
+            transition-transform duration-700 ease-out
+            group-hover:translate-x-[260%]
+          "
+                                        />
                                     </Link>
                                 ))}
                             </div>
                         </aside>
+
                     </div>
 
                     {/* Bottom info strip */}

@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+/* CTA PAGE */
+
+@layer utilities {
+  @keyframes pulseSoft { 0%,100% { opacity:.18 } 50% { opacity:.32 } }
+  .animate-pulse-soft { animation: pulseSoft 4.5s ease-in-out infinite; }
+
+  @keyframes slowShimmer { 0% { background-position:0% 50% } 100% { background-position:200% 50% } }
+  .gradient-shimmer { background-size:200% 100%; animation: slowShimmer 8s linear infinite; }
+
+  @keyframes sheen { from { transform:translateX(-160%) } to { transform:translateX(160%) } }
+  .btn-sheen { position:relative; overflow:hidden; }
+  .btn-sheen::before{
+    content:""; position:absolute; top:-30%; bottom:-30%; left:-40%; width:38%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+    transform:translateX(-160%);
+  }
+  .btn-sheen:hover::before{ animation:sheen .9s ease; }
+}
+
+/* No scrollbar in customer say */
+@layer utilities {
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
+

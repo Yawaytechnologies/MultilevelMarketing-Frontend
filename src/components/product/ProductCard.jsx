@@ -1,60 +1,162 @@
 // src/components/products/ProductCard.jsx
-import React from "react";
-import { Link } from "react-router-dom";
-
-const currency = (n) => `₹${n.toLocaleString("en-IN")}`;
+import React, { useState, useMemo } from "react";
+import { Heart, ShoppingCart } from "lucide-react";
 
 export default function ProductCard({ product, onAdd }) {
-  const p = product;
+  const {
+    title,
+    category,
+    price,
+    compareAt,
+    images = [],
+    badge,
+  } = product;
+
+  const [liked, setLiked] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const mainImage = useMemo(
+    () => images[activeIdx] ?? images[0],
+    [images, activeIdx]
+  );
+
+  const handleAdd = () => onAdd?.({ ...product, image: mainImage });
+
   return (
-    <article className="group border rounded-2xl overflow-hidden hover:shadow-xl transition">
-      <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+    <article
+  className="
+    group relative overflow-hidden rounded-2xl
+    border border-slate-300 bg-[#f5f5f5]
+    shadow-[0_6px_24px_rgba(0,0,0,0.25)]
+    transition-all duration-300 ease-out
+    hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(255,107,43,0.5)]
+    hover:border-[#FF6B2B] hover:ring-2 hover:ring-[#FF6B2B]/50
+  "
+>
+  {/* wishlist + badge */}
+  <button
+    aria-label="Add to wishlist"
+    onClick={() => setLiked((v) => !v)}
+    className="
+      absolute right-3 top-3 z-10 inline-flex size-9 items-center justify-center
+      rounded-full border border-slate-400 bg-white/80
+      transition-transform duration-200 hover:scale-105 active:scale-95
+    "
+  >
+    <Heart
+      className={`h-4 w-4 transition-colors ${
+        liked ? "fill-red-500 text-red-500" : "text-slate-600"
+      }`}
+    />
+  </button>
+
+  {badge && (
+    <span className="absolute left-3 top-3 z-10 rounded-md bg-[#FF6B2B] px-2 py-1 text-[11px] font-semibold text-white">
+      {badge}
+    </span>
+  )}
+
+  {/* image area */}
+  <div className="bg-[#e5e5e5]">
+    <div
+      className="
+        h-56 sm:h-64 flex items-center justify-center
+        will-change-transform
+      "
+    >
+      {mainImage ? (
         <img
-          src={p.img}
-          alt={p.title}
-          className="h-full w-full object-cover group-hover:scale-[1.02] transition"
-          loading="lazy"
+          src={mainImage}
+          alt={title}
+          className="
+            h-full w-full object-contain p-6
+            transition-transform duration-300 ease-out
+            group-hover:scale-[1.05]
+          "
+          draggable="false"
         />
+      ) : (
+        <div className="h-full w-full" />
+      )}
+    </div>
+
+    {/* thumbnails */}
+    {images.length > 0 && (
+      <div className="flex items-center gap-2 px-4 pb-4 -mt-2">
+        {images.slice(0, 4).map((src, i) => {
+          const active = activeIdx === i;
+          return (
+            <button
+              key={i}
+              onClick={() => setActiveIdx(i)}
+              className={`
+                h-10 w-12 rounded-md border transition-all duration-200
+                ${
+                  active
+                    ? "border-black ring-2 ring-[#FF6B2B]/30"
+                    : "border-slate-400 hover:border-[#FF6B2B] hover:-translate-y-0.5"
+                }
+              `}
+            >
+              <img
+                src={src}
+                alt=""
+                className={`h-full w-full object-contain p-1.5 ${
+                  active ? "" : "opacity-90 group-hover:opacity-100"
+                }`}
+              />
+            </button>
+          );
+        })}
+        {images.length > 4 && (
+          <span className="ml-1 text-xs text-slate-500">
+            +{images.length - 4}
+          </span>
+        )}
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold">{p.title}</h3>
-        <p className="mt-1 text-sm text-slate-600">{p.desc}</p>
+    )}
+  </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {p.tags?.map((t) => (
-            <span key={t} className="text-xs px-2 py-1 rounded-full bg-slate-100">
-              {t}
-            </span>
-          ))}
-        </div>
+  {/* content */}
+  <div className="px-4 pt-3 pb-4">
+    {category && (
+      <p className="text-[11px] uppercase tracking-wide text-slate-500">
+        {category}
+      </p>
+    )}
+    <h3 className="mt-1 text-base font-semibold text-black line-clamp-1">
+      {title}
+    </h3>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <div className="text-sm line-through text-slate-500">MRP {currency(p.mrp)}</div>
-            <div className="text-xl font-bold text-emerald-600">DP {currency(p.dp)}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-slate-500">PV</div>
-            <div className="font-semibold">{p.pv}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-slate-500">BV</div>
-            <div className="font-semibold">{p.bv}</div>
-          </div>
-        </div>
+    <div className="mt-2 flex items-baseline gap-2">
+      <span className="text-lg font-bold text-black">
+        ${price?.toFixed?.(2) ?? price}
+      </span>
+      {compareAt && (
+        <span className="text-sm text-slate-500 line-through">
+          ${Number(compareAt).toFixed(2)}
+        </span>
+      )}
+    </div>
 
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={() => onAdd?.(p)}
-            className="flex-1 rounded-xl px-4 py-2 bg-slate-900 text-white hover:bg-slate-800"
-          >
-            Add to Cart
-          </button>
-          <Link to={`/product/${p.id}`} className="rounded-xl px-4 py-2 border hover:bg-slate-50">
-            Details
-          </Link>
-        </div>
-      </div>
-    </article>
+    <button
+      onClick={handleAdd}
+      className="
+        mt-3 inline-flex w-full items-center justify-center gap-2
+        rounded-xl border border-slate-400 bg-white px-4 py-2.5
+        text-sm font-semibold text-black
+        transition-all duration-300
+        hover:bg-[#FF6B2B] hover:text-white hover:border-[#FF6B2B]
+        hover:shadow-[0_10px_20px_rgba(255,107,43,0.4)]
+        group-hover:-translate-y-0.5 active:translate-y-0
+        focus:outline-none focus:ring-2 focus:ring-[#FF6B2B]/30
+      "
+    >
+      <ShoppingCart className="h-4 w-4" />
+      ADD TO CART
+    </button>
+  </div>
+</article>
+
   );
 }
