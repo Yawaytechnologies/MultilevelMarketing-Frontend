@@ -4,8 +4,14 @@ export default function Hero() {
   const socials = ["Facebook", "Twitter", "Google+", "LinkedIn", "Instagram"];
   
 const scrollToContent = () => {
-  document.getElementById("content-start")
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const target = document.getElementById("content-start");
+    if (!target) return;
+
+  const header = document.querySelector("[data-app-header]");
+  const headerH = header?.offsetHeight ?? 72; // fallback if not found
+
+ const y = target.getBoundingClientRect().top + window.scrollY - headerH;
+ window.scrollTo({ top: y, behavior: "smooth" });
 };
 
   return (

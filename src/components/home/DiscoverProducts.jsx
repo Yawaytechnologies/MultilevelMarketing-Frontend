@@ -66,7 +66,7 @@ const CATEGORIES = [
 export default function DiscoverProducts() {
   return (
     <section id="discover" className="relative bg-white text-neutral-900">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-16 sm:pt-20 pb-6 sm:pb-8">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-6 sm:pt-8 pb-16 sm:pb-24">
         {/* Eyebrow */}
         <div className="flex items-center justify-center gap-3 uppercase tracking-[0.25em] text-xs sm:text-sm">
           <span className="h-px w-10 bg-neutral-300" />

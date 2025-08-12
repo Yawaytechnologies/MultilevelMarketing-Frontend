@@ -43,7 +43,16 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2">
               {/* header-style logo */}
-              <div className="grid size-9 place-items-center rounded-md bg-white text-black font-black">Λ</div>
+              <div className="grid place-items-center size-9 rounded-md bg-orange-500 text-white">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 10l8-6 8 6M4 16l8-6 8 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
               <span className="text-xl font-extrabold tracking-tight">LAKSHRA</span>
             </div>
 

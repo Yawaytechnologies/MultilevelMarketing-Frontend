@@ -16,7 +16,7 @@ export default function HeaderKoyeb({ mode = "sticky" }) {
     mode === "sticky" ? "sticky top-0 z-50" : "fixed inset-x-0 top-0 z-50";
 
   return (
-    <header className={wrapper}>
+     <header data-app-header className={wrapper}>
       {/* page bg bar (light linen vibe) */}
       <div className="w-full bg-[#f3d7cbbf] text-white backdrop-blur-md border-b border-white/15">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">

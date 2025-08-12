@@ -12,7 +12,7 @@ export default function Home() {
       {/* attaches under hero; sticks to top when reached */}
       <Header mode="sticky" />
 
-      <main id="content-start"  >
+      <main id="content-start" className="scroll-mt-[72px] md:scroll-mt-[80px]"  >
        <Carousel />
        <AboutMlm />
        <DiscoverProducts />
