@@ -5,6 +5,7 @@ import Carousel from "../components/home/Carousel";
 import AboutMlm from "../components/home/About";
 import DiscoverProducts from "../components/home/DiscoverProducts";
 import OurStory from "../components/home/OurStory";
+
 export default function Home() {
   return (
     <>
@@ -16,7 +17,9 @@ export default function Home() {
        <Carousel />
        <AboutMlm />
        <DiscoverProducts />
+      
         <OurStory />
+
         
       </main>
     </>
