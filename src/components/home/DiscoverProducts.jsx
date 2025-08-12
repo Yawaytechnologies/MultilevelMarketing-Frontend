@@ -1,4 +1,5 @@
 // src/components/home/DiscoverProducts.jsx
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   HeartPulse,
@@ -105,11 +106,10 @@ export default function DiscoverProducts() {
 function CategoryTile({
   to,
   label,
-  icon: Icon,
+  icon, // Access the icon directly
   img,
   decor,
   desc,
-  center = false,
 }) {
   const isBubbles = decor === "bubbles";
 
@@ -154,63 +154,73 @@ function CategoryTile({
 
       {/* ---------- CONTENT (centered chip) ---------- */}
       {isBubbles ? (
-  // Bubbles card — no white chip
-  <div className="absolute inset-0 z-10 grid place-items-center p-6 text-center">
-    <div className="max-w-xs">
-      <div
-        className="inline-grid size-11 place-items-center rounded-xl mb-2"
-        style={{ backgroundColor: "#FF6B2B1A", color: ACCENT }}
-      >
-        <Icon className="w-5 h-5" />
-      </div>
+        // Bubbles card — no white chip
+        <div className="absolute inset-0 z-10 grid place-items-center p-6 text-center">
+          <div className="max-w-xs">
+            <div
+              className="inline-grid size-11 place-items-center rounded-xl mb-2"
+              style={{ backgroundColor: "#FF6B2B1A", color: ACCENT }}
+            >
+              {/* Directly render the icon */}
+              {React.createElement(icon, { className: "w-5 h-5" })}
+            </div>
 
-      <div className="text-2xl font-extrabold text-neutral-900">
-        {label}
-      </div>
+            <div className="text-2xl font-extrabold text-neutral-900">
+              {label}
+            </div>
 
-      {desc && (
-        <p className="mt-2 text-sm text-neutral-800">
-          {desc}
-        </p>
+            {desc && (
+              <p className="mt-2 text-sm text-neutral-800">{desc}</p>
+            )}
+
+            <div className="mt-3 flex justify-center">
+              <span className="inline-flex items-center gap-1 rounded-md bg-neutral-900 text-white px-3 py-1.5 text-[13px] font-medium shadow-sm group-hover:opacity-95">
+                Open
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M8 5l8 7-8 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
+          <div className="max-w-[90%] sm:max-w-[75%] text-center">
+            <div className="mx-auto mb-2 grid size-9 place-items-center rounded-lg bg-white/15 text-white">
+              {/* Directly render the icon */}
+              {React.createElement(icon, { className: "w-4 h-4" })}
+            </div>
+            <div className="text-white text-xl sm:text-2xl font-bold drop-shadow-[0_2px_6px_rgba(0,0,0,.6)]">
+              {label}
+            </div>
+            {desc && (
+              <p className="mt-1 text-sm leading-snug text-white/90 drop-shadow">
+                {desc}
+              </p>
+            )}
+            <div className="mt-3 flex justify-center">
+              <span className="inline-flex items-center gap-1 rounded-md bg-white/95 text-neutral-900 px-3 py-1.5 text-[13px] font-medium shadow-sm group-hover:opacity-95">
+                Shop
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M8 5l8 7-8 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
       )}
-
-      <div className="mt-3 flex justify-center">
-        <span className="inline-flex items-center gap-1 rounded-md bg-neutral-900 text-white px-3 py-1.5 text-[13px] font-medium shadow-sm group-hover:opacity-95">
-          Open
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M8 5l8 7-8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-      </div>
-    </div>
-  </div>
-) : (
- 
-  <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
-    <div className="max-w-[90%] sm:max-w-[75%] text-center">
-      <div className="mx-auto mb-2 grid size-9 place-items-center rounded-lg bg-white/15 text-white">
-        <Icon className="w-4 h-4" />
-      </div>
-      <div className="text-white text-xl sm:text-2xl font-bold drop-shadow-[0_2px_6px_rgba(0,0,0,.6)]">
-        {label}
-      </div>
-      {desc && (
-        <p className="mt-1 text-sm leading-snug text-white/90 drop-shadow">
-          {desc}
-        </p>
-      )}
-      <div className="mt-3 flex justify-center">
-        <span className="inline-flex items-center gap-1 rounded-md bg-white/95 text-neutral-900 px-3 py-1.5 text-[13px] font-medium shadow-sm group-hover:opacity-95">
-          Shop
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M8 5l8 7-8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-      </div>
-    </div>
-  </div>
-)}
-
     </Link>
   );
 }

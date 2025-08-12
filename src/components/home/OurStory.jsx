@@ -1,4 +1,4 @@
-// src/components/home/OurStory.jsx
+// Import necessary icons
 import { MapPinned, Handshake, Factory, Smile } from "lucide-react";
 
 const ACCENT = "#FF6B2B";
@@ -21,58 +21,7 @@ const ITEMS = [
 export default function OurStory() {
   return (
     <section className="relative overflow-hidden bg-white text-neutral-900">
-      {/* base wash */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, #ffffff 0%, #fffaf7 45%, #f8fbff 100%)",
-        }}
-      />
-
-      {/* corner flares */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-28 -left-28 h-[28rem] w-[28rem] rounded-full opacity-45"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(255,107,43,0.20), rgba(255,107,43,0.10) 55%, transparent 70%)",
-          filter: "blur(18px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-32 -right-32 h-[34rem] w-[34rem] rounded-full opacity-40"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(115,155,255,0.18), rgba(115,155,255,0.08) 55%, transparent 70%)",
-          filter: "blur(22px)",
-        }}
-      />
-
-      {/* TOP vignette */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-20 sm:h-28"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0))",
-          // alternative (softer): "radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,.07), transparent 60%)"
-        }}
-      />
-
-      {/* BOTTOM vignette */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:h-32"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.08), rgba(0,0,0,0))",
-        }}
-      />
-
-      {/* content */}
+      {/* Content */}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-8 sm:pt-10 pb-16 sm:pb-20">
         <h2
           className="text-center font-extrabold leading-tight tracking-tight"
@@ -83,7 +32,7 @@ export default function OurStory() {
         <div className="mx-auto mt-3 h-1.5 w-16 rounded-full" style={{ backgroundColor: ACCENT }} />
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {ITEMS.map(({ icon: Icon, title, desc, tint }, i) => (
+          {ITEMS.map((item, i) => (
             <article
               key={i}
               className="group relative rounded-2xl border border-neutral-200 bg-white
@@ -93,13 +42,14 @@ export default function OurStory() {
             >
               <div
                 className="mb-5 inline-flex items-center justify-center rounded-2xl p-3 ring-1 ring-black/5"
-                style={{ backgroundColor: tint }}
+                style={{ backgroundColor: item.tint }}
               >
-                <Icon className="w-7 h-7" style={{ color: ACCENT }} />
+                {/* Directly using the icon */}
+                <item.icon className="w-7 h-7" style={{ color: ACCENT }} />
               </div>
 
-              <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-neutral-700">{desc}</p>
+              <h3 className="text-xl font-extrabold tracking-tight">{item.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-neutral-700">{item.desc}</p>
 
               <span
                 className="mt-6 block h-0.5 w-0 rounded-full transition-all duration-300 group-hover:w-16"
