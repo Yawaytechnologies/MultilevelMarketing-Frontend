@@ -3,7 +3,7 @@ import { FiShoppingCart } from "react-icons/fi";
 
 
 const NAV = [
-  { label: "Home", href: "/home" },
+  { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
   { label: "Join Us", href: "/joinus" },
   { label: "About", href: "/about" },
