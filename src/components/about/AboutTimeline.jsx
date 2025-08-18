@@ -1,12 +1,8 @@
 // src/components/about/AboutTimeline.jsx
+
 import React, { useRef } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+// eslint-disable-next-line
+import {motion,useReducedMotion,useScroll,useSpring,useTransform} from "framer-motion";
 import { Rocket, Truck, ShieldCheck, Smartphone, MapPin } from "lucide-react";
 
 /** ===== Brand tokens (tweak here) ===== */

@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line
 import { motion, useReducedMotion } from "framer-motion";
 
 const BADGES = [
