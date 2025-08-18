@@ -1,9 +1,9 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Footer from "./components/common/Footer";
-import Home from "./pages/Home";
-import Test from "./pages/Test";
 import Header from "./components/common/Header";
+import Footer from "./components/common/Footer";
+
+import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import JoinUs from "./pages/JoinUs";
 import DistributorLogin from "../src/components/distributor/Login";
