@@ -112,7 +112,7 @@ export default function HeaderKoyeb({ mode = "sticky" }) {
             {/* Mobile burger */}
             <button
               onClick={() => setOpen((s) => !s)}
-              className="lg:hidden ml-1 rounded-md border border-neutral-300 bg-white/80 px-3 py-2 hover:bg-white"
+              className="lg:hidden ml-1 rounded-md border border-neutral-300 bg-black/80 px-3 py-2 hover:bg-white"
               aria-label="Toggle menu"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
