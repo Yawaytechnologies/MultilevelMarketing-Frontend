@@ -1,4 +1,3 @@
-// src/pages/distributor/Genealogy.jsx
 import React, { useMemo, useRef, useState } from "react";
 import {
   LayoutDashboard, Wallet, ReceiptText, Users, HelpCircle, LogOut,
@@ -6,9 +5,9 @@ import {
   Plus, X, ChevronLeft, ChevronRight, Mail, Lock, Calendar, Phone, Globe
 } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/* Demo data (replace with API data)                                   */
-/* ------------------------------------------------------------------ */
+/* -------------------------------------------- */
+/* Demo data (replace with API data)            */
+/* -------------------------------------------- */
 const initialTree = {
   id: "U1000",
   username: "demouser",
@@ -61,15 +60,13 @@ const initialTree = {
   }
 };
 
-/* ------------------------------------------------------------------ */
-/* Helpers: layout, id/password, tree ops                              */
-/* ------------------------------------------------------------------ */
+/* -------------------------------------------- */
+/* Helpers: layout, id/password, tree ops       */
+/* -------------------------------------------- */
 function depthOf(n) {
   if (!n) return 0;
   return 1 + Math.max(depthOf(n.left), depthOf(n.right));
 }
-
-/** Measure “leaf units” so single-child trees still reserve space. */
 function measure(n) {
   if (!n) return 1;
   const lw = measure(n.left);
@@ -77,20 +74,15 @@ function measure(n) {
   n._widthUnits = (n.left || n.right) ? lw + rw : 1;
   return n._widthUnits;
 }
-
-/** Assign x/y in *units* (not pixels). Later we multiply for pixels. */
 function assignPositions(n, depth, leftEdge) {
   if (!n) return null;
   const lw = n.left ? n.left._widthUnits : 1;
   const rw = n.right ? n.right._widthUnits : 1;
   const width = (n.left || n.right) ? lw + rw : 1;
-
   const xUnits = leftEdge + width / 2;
   const y = depth;
-
   const left = n.left ? assignPositions(n.left, depth + 1, leftEdge) : null;
   const right = n.right ? assignPositions(n.right, depth + 1, leftEdge + lw) : null;
-
   return {
     ...n,
     xUnits,
@@ -99,15 +91,12 @@ function assignPositions(n, depth, leftEdge) {
     right,
   };
 }
-
-/** Build a positioned copy of the tree. */
 function mapTreePositions(root) {
   const clone = JSON.parse(JSON.stringify(root));
   const totalLeaves = measure(clone);
   const tree = assignPositions(clone, 0, 0);
   return { tree, totalLeaves };
 }
-
 function collectIds(n, set = new Set()) {
   if (!n) return set;
   set.add(n.id);
@@ -115,7 +104,6 @@ function collectIds(n, set = new Set()) {
   collectIds(n.right, set);
   return set;
 }
-
 function genId(existing) {
   let id;
   do {
@@ -123,9 +111,6 @@ function genId(existing) {
   } while (existing.has(id));
   return id;
 }
-
-
-/** Pure functional insert: add under targetId on 'left' or 'right'. */
 function addUnder(root, targetId, side, node) {
   if (!root) return root;
   const r = structuredClone(root);
@@ -146,17 +131,14 @@ function addUnder(root, targetId, side, node) {
   return r;
 }
 
-/* ------------------------------------------------------------------ */
-/* UI pieces                                                           */
-/* ------------------------------------------------------------------ */
-const ACCENT = "#FF6B2B";
-
+/* -------------------------------------------- */
+/* SIDEBAR (desktop/tablet only)                */
+/* -------------------------------------------- */
 function Sidebar() {
-  // Now Item just takes children (icon) and label
   const Item = ({ label, active, children }) => (
     <a
       href="#"
-      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[15px] ${
+      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[15px] w-full ${
         active ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
       }`}
     >
@@ -164,10 +146,9 @@ function Sidebar() {
       {label}
     </a>
   );
-
   return (
-    <aside className="sticky top-0 h-[calc(100svh-24px)] rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200">
-      <div className="flex items-center gap-3">
+    <aside className="hidden md:block bg-white p-4 shadow-sm ring-1 ring-neutral-200 rounded-2xl w-[270px] sticky top-0 h-[calc(100svh-24px)] mb-4 md:mb-0">
+      <div className="flex items-center gap-3 mb-4">
         <div className="grid size-9 place-items-center rounded-md bg-orange-500 text-white">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M4 10l8-6 8 6M4 16l8-6 8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -175,8 +156,7 @@ function Sidebar() {
         </div>
         <div className="font-extrabold">LAKSHRA</div>
       </div>
-
-      <nav className="mt-6 space-y-1">
+      <nav className="space-y-1">
         <Item label="Dashboard" active>
           <LayoutDashboard className="h-4 w-4" />
         </Item>
@@ -199,7 +179,6 @@ function Sidebar() {
           <HelpCircle className="h-4 w-4" />
         </Item>
       </nav>
-
       <button className="mt-6 inline-flex w-full items-center gap-2 rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-semibold hover:bg-neutral-200">
         <LogOut className="h-4 w-4" /> Sign out
       </button>
@@ -207,7 +186,36 @@ function Sidebar() {
   );
 }
 
+/* -------------------------------------------- */
+/* BOTTOM NAV (mobile only)                     */
+/* -------------------------------------------- */
+function BottomNav({ active = "Genealogy" }) {
+  const navItems = [
+    { label: "Dashboard", icon: LayoutDashboard },
+    { label: "Business", icon: ShoppingBag },
+    { label: "Genealogy", icon: TreePine },
+    { label: "Financial", icon: Wallet },
+  ];
+  return (
+    <nav className="fixed md:hidden bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 flex justify-around items-center h-16 shadow-xl">
+      {navItems.map(item => (
+        <button
+          key={item.label}
+          className={`flex flex-col items-center justify-center flex-1 text-xs font-medium ${
+            active === item.label ? "text-orange-500" : "text-neutral-500"
+          }`}
+        >
+          <item.icon className="h-5 w-5 mb-1" />
+          {item.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
 
+/* -------------------------------------------- */
+/* NODE CARD                                   */
+/* -------------------------------------------- */
 function NodeCard({ node, selectedId, onSelect }) {
   const selected = selectedId === node.id;
   return (
@@ -227,36 +235,29 @@ function NodeCard({ node, selectedId, onSelect }) {
   );
 }
 
-/* ------------------------------ Tree canvas (SVG links) ------------------------------ */
+/* -------------------------------------------- */
+/* TREE CANVAS                                 */
+/* -------------------------------------------- */
 function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
   const { tree, totalLeaves } = useMemo(() => mapTreePositions(data), [data]);
-
-  // display constants
-  const unitX = 220;                 // horizontal spacing per unit
-  const cardTopOffset = 60;          // top padding
-  const rowY = 130;                  // vertical spacing per depth row
-  const cardCenterXShift = 80;       // center of 160px card
-
+  const unitX = 220, cardTopOffset = 60, rowY = 130, cardCenterXShift = 80;
   const W = Math.max(totalLeaves * unitX + 220, 900);
   const H = cardTopOffset + rowY * (depthOf(tree));
-
-  const [scale, setScale]   = useState(1);
-  const [pan, setPan]       = useState({ x: 0, y: 0 });
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+  const defaultScale = isMobile ? 0.55 : 1;
+  const defaultPanX = isMobile ? Math.max((window.innerWidth - W * defaultScale) / 2, 0) : 0;
+  const [scale, setScale] = useState(defaultScale);
+  const [pan, setPan] = useState({ x: defaultPanX, y: isMobile ? -40 : 0 });
   const drag = useRef({ on:false, ox:0, oy:0, sx:0, sy:0 });
-
   function nodePx(n) {
     const x = 110 + n.xUnits * unitX - cardCenterXShift;
     const y = cardTopOffset + n.y * rowY;
     return { x, y };
   }
-
-  // pan/zoom
   function startDrag(e){ drag.current={on:true, ox:e.clientX, oy:e.clientY, sx:pan.x, sy:pan.y}; }
   function moveDrag(e){ if(!drag.current.on) return; setPan({ x: drag.current.sx + (e.clientX - drag.current.ox), y: drag.current.sy + (e.clientY - drag.current.oy) }); }
   function endDrag(){ drag.current.on=false; }
-  function onWheel(e){ e.preventDefault(); setScale(s => Math.min(1.4, Math.max(0.6, s + (e.deltaY < 0 ? 0.08 : -0.08)))) }
-
-  // collect edges & nodes
+  function onWheel(e){ e.preventDefault(); setScale(s => Math.min(1.4, Math.max(0.4, s + (e.deltaY < 0 ? 0.08 : -0.08)))) }
   const edges = [];
   const nodeElems = (function build(n){
     if(!n) return null;
@@ -269,7 +270,6 @@ function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
       const rp = nodePx(n.right);
       edges.push({ x1: pos.x + cardCenterXShift, y1: pos.y + 40, x2: rp.x + cardCenterXShift, y2: rp.y });
     }
-
     return (
       <React.Fragment key={n.id}>
         <div className="absolute" style={{ left: pos.x, top: pos.y }}>
@@ -289,24 +289,20 @@ function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
             </button>
           </div>
         </div>
-
         {build(n.left)}
         {build(n.right)}
       </React.Fragment>
     );
   })(tree);
-
   return (
-    <div className="relative h-[680px] overflow-hidden rounded-xl ring-1 ring-neutral-200 bg-white">
-      {/* toolbar */}
-      <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg bg-white/90 p-1 ring-1 ring-neutral-200 shadow-sm">
+    <div className="relative h-[420px] sm:h-[680px] overflow-x-auto rounded-xl ring-1 ring-neutral-200 bg-white">
+      <div className="absolute right-2 top-2 z-30 flex items-center gap-1 rounded-lg bg-white/90 p-1 ring-1 ring-neutral-200 shadow-sm">
         <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>setScale(s=>Math.min(1.4, s+0.08))}><ZoomIn className="h-4 w-4"/></button>
-        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>setScale(s=>Math.max(0.6, s-0.08))}><ZoomOut className="h-4 w-4"/></button>
-        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>{ setScale(1); setPan({x:0,y:0}); }}><RotateCcw className="h-4 w-4"/></button>
+        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>setScale(s=>Math.max(0.4, s-0.08))}><ZoomOut className="h-4 w-4"/></button>
+        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>{ setScale(defaultScale); setPan({x: defaultPanX, y: isMobile ? -40 : 0}); }}><RotateCcw className="h-4 w-4"/></button>
         <div className="mx-1 h-5 w-px bg-neutral-200" />
         <Move className="mx-1 h-4 w-4 text-neutral-500" />
       </div>
-
       <div
         className="absolute inset-0 cursor-grab"
         onPointerDown={startDrag}
@@ -318,9 +314,15 @@ function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
       >
         <div
           className="absolute"
-          style={{ left: pan.x, top: pan.y, width: W, height: H, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+          style={{
+            left: pan.x,
+            top: pan.y,
+            width: W,
+            height: H,
+            transform: `scale(${scale})`,
+            transformOrigin: "0 0"
+          }}
         >
-          {/* ALL links live inside this SVG so they pan/zoom with nodes */}
           <svg className="absolute left-0 top-0" width={W} height={H}>
             {edges.map((e, i) => (
               <path
@@ -332,8 +334,6 @@ function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
               />
             ))}
           </svg>
-
-          {/* Nodes on top */}
           {nodeElems}
         </div>
       </div>
@@ -341,7 +341,9 @@ function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
   );
 }
 
-/* ------------------------------ Add User Modal ------------------------------- */
+/* -------------------------------------------- */
+/* ADD USER MODAL                              */
+/* -------------------------------------------- */
 function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -350,14 +352,11 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
   const [dob, setDob] = useState("");
   const [country, setCountry] = useState("");
   const [mobile, setMobile] = useState("");
-
   if (!open) return null;
-
   function submit(e) {
     e.preventDefault();
     if (pass !== confirm) { alert("Passwords do not match"); return; }
     if (!username) { alert("Username is required"); return; }
-
     onCreate({
       username,
       name: username,
@@ -365,7 +364,6 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
       email, pass, dob, country, mobile
     });
   }
-
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4">
       <form onSubmit={submit} className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
@@ -373,7 +371,6 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
           <h3 className="text-lg font-semibold">Add User</h3>
           <button type="button" onClick={onClose} className="rounded p-1 hover:bg-neutral-100"><X className="h-5 w-5" /></button>
         </div>
-
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium">Select Referral</label>
@@ -391,7 +388,6 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
               <input value={email} onChange={(e)=>setEmail(e.target.value)} type="email" placeholder="name@example.com" className="h-10 w-full outline-none"/>
             </div>
           </div>
-
           <div>
             <label className="mb-1 block text-sm font-medium">Username</label>
             <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
@@ -405,7 +401,6 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
               <input value={pass} onChange={(e)=>setPass(e.target.value)} type="password" placeholder="••••••••" className="h-10 w-full outline-none"/>
             </div>
           </div>
-
           <div>
             <label className="mb-1 block text-sm font-medium">Confirm Password</label>
             <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
@@ -420,7 +415,6 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
               <input value={dob} onChange={(e)=>setDob(e.target.value)} type="date" className="h-10 w-full outline-none"/>
             </div>
           </div>
-
           <div>
             <label className="mb-1 block text-sm font-medium">Country</label>
             <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
@@ -436,29 +430,40 @@ function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
             </div>
           </div>
         </div>
-
         <div className="mt-2 flex items-center justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-lg border border-neutral-300 px-4 py-2">Close</button>
-          <button type="submit" className="rounded-lg px-4 py-2 text-white" style={{ backgroundColor: ACCENT }}>Submit</button>
+          <button type="submit" className="rounded-lg px-4 py-2 text-white" style={{ backgroundColor: "#FF6B2B" }}>Submit</button>
         </div>
       </form>
     </div>
   );
 }
 
-/* ------------------------------ Page ---------------------------------------- */
+/* -------------------------------------------- */
+/* INFO CARD                                   */
+/* -------------------------------------------- */
+function Info({ label, value }) {
+  return (
+    <div className="rounded-xl border border-neutral-200 px-3 py-2">
+      <div className="text-[11px] text-neutral-500">{label}</div>
+      <div className="font-semibold">{value}</div>
+    </div>
+  );
+}
+
+/* -------------------------------------------- */
+/* MAIN COMPONENT                              */
+/* -------------------------------------------- */
 export default function GenealogyPage() {
   const [tree, setTree] = useState(initialTree);
   const [selectedId, setSelectedId] = useState(initialTree.id);
   const [modal, setModal] = useState({ open: false, parent: null, side: "left" });
   const sel = useMemo(() => findNode(tree, selectedId), [tree, selectedId]);
-
   function findNode(n, id) {
     if (!n) return null;
     if (n.id === id) return n;
     return findNode(n.left, id) || findNode(n.right, id);
   }
-
   function openAdd(parent, side) {
     setModal({ open: true, parent, side });
   }
@@ -478,20 +483,16 @@ export default function GenealogyPage() {
       setTree(updated);
       setSelectedId(newId);
       setModal({ open: false, parent: null, side: "left" });
-      // (Optional) you can show generated password somewhere:
-      // const tempPass = genPassword();
     } catch (e) {
       alert(e.message);
     }
   }
-
   return (
-    <div className="min-h-[100svh] bg-neutral-50 px-3 mt-20 py-3 sm:px-4 sm:py-4">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-[270px_minmax(0,1fr)_320px]">
+    <div className="min-h-screen bg-neutral-50 px-1  mt-19 py-2 sm:px-4 sm:py-4 pb-24">
+      <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-[270px_minmax(0,1fr)_320px] gap-4">
         <Sidebar />
-
-        {/* Middle column */}
-        <main className="rounded-2xl bg-white p-3 ring-1 ring-neutral-200">
+        {/* MIDDLE: Main content */}
+        <main className="rounded-2xl bg-white p-2 sm:p-3 ring-1 ring-neutral-200 w-full flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3 px-1">
             <div>
               <h1 className="text-lg font-bold">Binary: Genealogy</h1>
@@ -499,18 +500,16 @@ export default function GenealogyPage() {
                 Click a node to view details. Use pan/zoom or the toolbar.
               </p>
             </div>
-
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center rounded-xl bg-neutral-50 px-3 ring-1 ring-neutral-200">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="flex items-center rounded-xl bg-neutral-50 px-3 ring-1 ring-neutral-200 w-full sm:w-auto">
                 <Search className="mr-2 h-4 w-4 text-neutral-500" />
-                <input placeholder="Search by username…" className="h-9 w-56 bg-transparent outline-none" />
+                <input placeholder="Search by username…" className="h-9 w-40 sm:w-56 bg-transparent outline-none" />
                 <button className="ml-2 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-semibold text-white">Search</button>
                 <button className="ml-2 rounded-lg border border-neutral-300 px-2 py-1.5 text-sm">Reset</button>
               </div>
             </div>
           </div>
-
-          <div className="mt-3">
+          <div className="mt-3 w-full overflow-x-auto">
             <TreeCanvas
               data={tree}
               selectedId={selectedId}
@@ -519,9 +518,8 @@ export default function GenealogyPage() {
             />
           </div>
         </main>
-
-        {/* Right panel (details) */}
-        <aside className="space-y-3">
+        {/* RIGHT: User info */}
+        <aside className="space-y-3 w-full md:w-[320px]">
           <div className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
             <div className="flex items-center gap-3">
               <div className="size-11 overflow-hidden rounded-full ring-2 ring-white shadow">
@@ -532,7 +530,6 @@ export default function GenealogyPage() {
                 <div className="text-xs text-neutral-500">@{sel?.username?.split(" ").join("").toLowerCase()}</div>
               </div>
             </div>
-
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <Info label="ID" value={sel?.id ?? "—"} />
               <Info label="PV" value={sel?.pv ?? "—"} />
@@ -546,7 +543,6 @@ export default function GenealogyPage() {
               <Info label="TOTAL LEFT USERS" value="—" />
               <Info label="TOTAL RIGHT USERS" value="—" />
             </div>
-
             <div className="mt-3 flex items-center justify-between gap-2">
               <button
                 onClick={() => openAdd(sel, "left")}
@@ -564,8 +560,7 @@ export default function GenealogyPage() {
           </div>
         </aside>
       </div>
-
-      {/* Modal */}
+      <BottomNav active="Genealogy" />
       <AddUserModal
         open={modal.open}
         parent={modal.parent}
@@ -573,15 +568,6 @@ export default function GenealogyPage() {
         onClose={() => setModal({ open:false, parent:null, side:"left" })}
         onCreate={createUser}
       />
-    </div>
-  );
-}
-
-function Info({ label, value }) {
-  return (
-    <div className="rounded-xl border border-neutral-200 px-3 py-2">
-      <div className="text-[11px] text-neutral-500">{label}</div>
-      <div className="font-semibold">{value}</div>
     </div>
   );
 }
