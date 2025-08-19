@@ -5,7 +5,7 @@ const ACCENT = "#FF6B2B";
 
 export default function DistributorLogin() {
   return (
-    <main className="min-h-[100svh] bg-neutral-50 grid place-items-center px-4">
+    <main className="min-h-[100svh] bg-neutral-50 mt-10 grid place-items-center px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-xl ring-1 ring-neutral-200">
         {/* Brand */}
         <div className="flex items-center gap-3">

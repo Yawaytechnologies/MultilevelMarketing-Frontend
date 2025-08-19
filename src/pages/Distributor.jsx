@@ -1,368 +1,574 @@
-// src/pages/distributor/Dashboard.jsx
-import React, { useMemo, useState } from "react";
+// src/pages/distributor/Genealogy.jsx
+import React, { useMemo, useRef, useState } from "react";
 import {
-  LayoutDashboard, TreePine, ShoppingBag, Wallet, ReceiptText,
-  Users, HelpCircle, LogOut, ArrowLeftRight, Crown, Zap, TrendingUp, X, Copy
+  LayoutDashboard, Wallet, ReceiptText, Users, HelpCircle, LogOut,
+  TreePine, ShoppingBag, Search, ZoomIn, ZoomOut, RotateCcw, Move,
+  Plus, X, ChevronLeft, ChevronRight, Mail, Lock, Calendar, Phone, Globe
 } from "lucide-react";
-import BinaryTree from "../components/distributor/BinaryTree";
 
-const ACCENT = "#FF6B2B";
-
-/* Initial demo tree (you can replace with API data later) */
+/* ------------------------------------------------------------------ */
+/* Demo data (replace with API data)                                   */
+/* ------------------------------------------------------------------ */
 const initialTree = {
-  id: "U1001",
-  name: "You",
-  rank: "Silver",
-  pv: 320,
+  id: "U1000",
+  username: "demouser",
+  name: "demo user",
+  pv: 0,
+  rank: "—",
   status: "Active",
+  avatar: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=300&auto=format&fit=crop",
   left: {
-    id: "U1012",
-    name: "Anika",
-    rank: "Bronze",
-    pv: 180,
-    status: "Active",
-    left: { id: "U1030", name: "Ravi", rank: "—", pv: 40, status: "New" },
-    right: { id: "U1031", name: "Sam", rank: "—", pv: 20, status: "Inactive" },
+    id: "U1001",
+    username: "oliviaparker",
+    name: "Olivia Parker",
+    pv: 0, rank: "—", status: "—",
+    avatar: "https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=300&auto=format&fit=crop",
+    left: {
+      id: "U1003",
+      username: "ethanmitchell",
+      name: "Ethan Mitchell",
+      pv: 0, rank: "—", status: "—",
+      avatar: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=300&auto=format&fit=crop"
+    },
+    right: {
+      id: "U1004",
+      username: "sophiaclark",
+      name: "Sophia Clark",
+      pv: 0, rank: "—", status: "—",
+      avatar: "https://images.unsplash.com/photo-1545996124-0501ebae84d5?q=80&w=300&auto=format&fit=crop"
+    }
   },
   right: {
-    id: "U1013",
-    name: "Dev",
-    rank: "Bronze",
-    pv: 200,
-    status: "Active",
-    left: { id: "U1032", name: "Maya", rank: "—", pv: 60, status: "Active" },
-    right: { id: "U1033", name: "Irfan", rank: "—", pv: 35, status: "New" },
-  },
+    id: "U1002",
+    username: "emmarussell",
+    name: "Emma Russell",
+    pv: 0, rank: "—", status: "—",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+    left: {
+      id: "U1005",
+      username: "isabellawhite456",
+      name: "Isabella White",
+      pv: 0, rank: "—", status: "—",
+      avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=300&auto=format&fit=crop"
+    },
+    right: {
+      id: "U1006",
+      username: "masonhayes789",
+      name: "Mason Hayes",
+      pv: 0, rank: "—", status: "—",
+      avatar: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=300&auto=format&fit=crop"
+    }
+  }
 };
 
-export default function DistributorDashboard() {
+/* ------------------------------------------------------------------ */
+/* Helpers: layout, id/password, tree ops                              */
+/* ------------------------------------------------------------------ */
+function depthOf(n) {
+  if (!n) return 0;
+  return 1 + Math.max(depthOf(n.left), depthOf(n.right));
+}
+
+/** Measure “leaf units” so single-child trees still reserve space. */
+function measure(n) {
+  if (!n) return 1;
+  const lw = measure(n.left);
+  const rw = measure(n.right);
+  n._widthUnits = (n.left || n.right) ? lw + rw : 1;
+  return n._widthUnits;
+}
+
+/** Assign x/y in *units* (not pixels). Later we multiply for pixels. */
+function assignPositions(n, depth, leftEdge) {
+  if (!n) return null;
+  const lw = n.left ? n.left._widthUnits : 1;
+  const rw = n.right ? n.right._widthUnits : 1;
+  const width = (n.left || n.right) ? lw + rw : 1;
+
+  const xUnits = leftEdge + width / 2;
+  const y = depth;
+
+  const left = n.left ? assignPositions(n.left, depth + 1, leftEdge) : null;
+  const right = n.right ? assignPositions(n.right, depth + 1, leftEdge + lw) : null;
+
+  return {
+    ...n,
+    xUnits,
+    y,
+    left,
+    right,
+  };
+}
+
+/** Build a positioned copy of the tree. */
+function mapTreePositions(root) {
+  const clone = JSON.parse(JSON.stringify(root));
+  const totalLeaves = measure(clone);
+  const tree = assignPositions(clone, 0, 0);
+  return { tree, totalLeaves };
+}
+
+function collectIds(n, set = new Set()) {
+  if (!n) return set;
+  set.add(n.id);
+  collectIds(n.left, set);
+  collectIds(n.right, set);
+  return set;
+}
+
+function genId(existing) {
+  let id;
+  do {
+    id = "U" + Math.floor(100000 + Math.random() * 900000);
+  } while (existing.has(id));
+  return id;
+}
+function genPassword(len = 10) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$";
+  return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
+/** Pure functional insert: add under targetId on 'left' or 'right'. */
+function addUnder(root, targetId, side, node) {
+  if (!root) return root;
+  const r = structuredClone(root);
+  (function dfs(n) {
+    if (!n) return false;
+    if (n.id === targetId) {
+      if (side === "left") {
+        if (n.left) throw new Error("Left leg already filled.");
+        n.left = node;
+      } else {
+        if (n.right) throw new Error("Right leg already filled.");
+        n.right = node;
+      }
+      return true;
+    }
+    return dfs(n.left) || dfs(n.right);
+  })(r);
+  return r;
+}
+
+/* ------------------------------------------------------------------ */
+/* UI pieces                                                           */
+/* ------------------------------------------------------------------ */
+const ACCENT = "#FF6B2B";
+
+function Sidebar() {
+  const Item = ({ icon: Icon, label, active }) => (
+    <a
+      href="#"
+      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[15px] ${
+        active ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
+      }`}
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </a>
+  );
+
+  return (
+    <aside className="sticky top-0 h-[calc(100svh-24px)] rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200">
+      <div className="flex items-center gap-3">
+        <div className="grid size-9 place-items-center rounded-md bg-orange-500 text-white">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 10l8-6 8 6M4 16l8-6 8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <div className="font-extrabold">LAKSHRA</div>
+      </div>
+
+      <nav className="mt-6 space-y-1">
+        <Item icon={LayoutDashboard} label="Dashboard" />
+        <Item icon={ShoppingBag} label="Business" />
+        <Item icon={TreePine} label="Genealogy" active />
+        <Item icon={Wallet} label="Financial" />
+        <Item icon={ReceiptText} label="Reports" />
+        <Item icon={Users} label="Members" />
+        <Item icon={HelpCircle} label="Support" />
+      </nav>
+
+      <button className="mt-6 inline-flex w-full items-center gap-2 rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-semibold hover:bg-neutral-200">
+        <LogOut className="h-4 w-4" /> Sign out
+      </button>
+    </aside>
+  );
+}
+
+function NodeCard({ node, selectedId, onSelect }) {
+  const selected = selectedId === node.id;
+  return (
+    <div
+      onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}
+      className={`w-[160px] rounded-xl bg-white px-3 py-2 text-center ring-1 shadow-sm cursor-pointer
+                  ${selected ? "ring-neutral-900" : "ring-neutral-200 hover:ring-neutral-300"}`}
+    >
+      <div className="mx-auto mb-1 size-10 overflow-hidden rounded-full ring-2 ring-white shadow">
+        <img src={node.avatar} alt="" className="h-full w-full object-cover" />
+      </div>
+      <div className="text-sm font-semibold truncate" title={node.username}>
+        {node.username}
+      </div>
+      <div className="text-[11px] text-neutral-500">ID: {node.id}</div>
+    </div>
+  );
+}
+
+/* ------------------------------ Tree canvas (SVG links) ------------------------------ */
+function TreeCanvas({ data, selectedId, onSelect, onAdd }) {
+  const { tree, totalLeaves } = useMemo(() => mapTreePositions(data), [data]);
+
+  // display constants
+  const unitX = 220;                 // horizontal spacing per unit
+  const cardTopOffset = 60;          // top padding
+  const rowY = 130;                  // vertical spacing per depth row
+  const cardCenterXShift = 80;       // center of 160px card
+
+  const W = Math.max(totalLeaves * unitX + 220, 900);
+  const H = cardTopOffset + rowY * (depthOf(tree));
+
+  const [scale, setScale]   = useState(1);
+  const [pan, setPan]       = useState({ x: 0, y: 0 });
+  const drag = useRef({ on:false, ox:0, oy:0, sx:0, sy:0 });
+
+  function nodePx(n) {
+    const x = 110 + n.xUnits * unitX - cardCenterXShift;
+    const y = cardTopOffset + n.y * rowY;
+    return { x, y };
+  }
+
+  // pan/zoom
+  function startDrag(e){ drag.current={on:true, ox:e.clientX, oy:e.clientY, sx:pan.x, sy:pan.y}; }
+  function moveDrag(e){ if(!drag.current.on) return; setPan({ x: drag.current.sx + (e.clientX - drag.current.ox), y: drag.current.sy + (e.clientY - drag.current.oy) }); }
+  function endDrag(){ drag.current.on=false; }
+  function onWheel(e){ e.preventDefault(); setScale(s => Math.min(1.4, Math.max(0.6, s + (e.deltaY < 0 ? 0.08 : -0.08)))) }
+
+  // collect edges & nodes
+  const edges = [];
+  const nodeElems = (function build(n){
+    if(!n) return null;
+    const pos = nodePx(n);
+    if (n.left) {
+      const lp = nodePx(n.left);
+      edges.push({ x1: pos.x + cardCenterXShift, y1: pos.y + 40, x2: lp.x + cardCenterXShift, y2: lp.y });
+    }
+    if (n.right) {
+      const rp = nodePx(n.right);
+      edges.push({ x1: pos.x + cardCenterXShift, y1: pos.y + 40, x2: rp.x + cardCenterXShift, y2: rp.y });
+    }
+
+    return (
+      <React.Fragment key={n.id}>
+        <div className="absolute" style={{ left: pos.x, top: pos.y }}>
+          <NodeCard node={n} selectedId={selectedId} onSelect={onSelect} />
+          <div className="mt-1 flex items-center justify-center gap-2">
+            <button
+              onClick={(e)=>{ e.stopPropagation(); onAdd(n,"left"); }}
+              className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs ring-1 ring-neutral-300 hover:bg-neutral-50"
+            >
+              <Plus className="h-4 w-4" /> Left
+            </button>
+            <button
+              onClick={(e)=>{ e.stopPropagation(); onAdd(n,"right"); }}
+              className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs ring-1 ring-neutral-300 hover:bg-neutral-50"
+            >
+              <Plus className="h-4 w-4" /> Right
+            </button>
+          </div>
+        </div>
+
+        {build(n.left)}
+        {build(n.right)}
+      </React.Fragment>
+    );
+  })(tree);
+
+  return (
+    <div className="relative h-[680px] overflow-hidden rounded-xl ring-1 ring-neutral-200 bg-white">
+      {/* toolbar */}
+      <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg bg-white/90 p-1 ring-1 ring-neutral-200 shadow-sm">
+        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>setScale(s=>Math.min(1.4, s+0.08))}><ZoomIn className="h-4 w-4"/></button>
+        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>setScale(s=>Math.max(0.6, s-0.08))}><ZoomOut className="h-4 w-4"/></button>
+        <button className="rounded p-2 hover:bg-neutral-100" onClick={()=>{ setScale(1); setPan({x:0,y:0}); }}><RotateCcw className="h-4 w-4"/></button>
+        <div className="mx-1 h-5 w-px bg-neutral-200" />
+        <Move className="mx-1 h-4 w-4 text-neutral-500" />
+      </div>
+
+      <div
+        className="absolute inset-0 cursor-grab"
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onWheel={onWheel}
+        onClick={() => onSelect(null)}
+      >
+        <div
+          className="absolute"
+          style={{ left: pan.x, top: pan.y, width: W, height: H, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+        >
+          {/* ALL links live inside this SVG so they pan/zoom with nodes */}
+          <svg className="absolute left-0 top-0" width={W} height={H}>
+            {edges.map((e, i) => (
+              <path
+                key={i}
+                d={`M ${e.x1} ${e.y1} C ${e.x1} ${e.y1 + 32}, ${e.x2} ${e.y2 - 32}, ${e.x2} ${e.y2}`}
+                stroke="#CBD5E1"
+                strokeWidth="2"
+                fill="none"
+              />
+            ))}
+          </svg>
+
+          {/* Nodes on top */}
+          {nodeElems}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------ Add User Modal ------------------------------- */
+function AddUserModal({ open, onClose, parent, side = "left", onCreate }) {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [pass, setPass] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [dob, setDob] = useState("");
+  const [country, setCountry] = useState("");
+  const [mobile, setMobile] = useState("");
+
+  if (!open) return null;
+
+  function submit(e) {
+    e.preventDefault();
+    if (pass !== confirm) { alert("Passwords do not match"); return; }
+    if (!username) { alert("Username is required"); return; }
+
+    onCreate({
+      username,
+      name: username,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username)}&backgroundType=gradientLinear`,
+      email, pass, dob, country, mobile
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4">
+      <form onSubmit={submit} className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Add User</h3>
+          <button type="button" onClick={onClose} className="rounded p-1 hover:bg-neutral-100"><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Select Referral</label>
+            <div className="flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-2 text-sm">
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-medium">{parent?.username}</span>
+              <span className="text-neutral-500">({parent?.id})</span>
+              <span className="ml-auto rounded bg-neutral-900 px-2 py-0.5 text-[11px] font-semibold text-white">{side.toUpperCase()}</span>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Email</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Mail className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={email} onChange={(e)=>setEmail(e.target.value)} type="email" placeholder="name@example.com" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">Username</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <input value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="newuser123" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Password</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Lock className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={pass} onChange={(e)=>setPass(e.target.value)} type="password" placeholder="••••••••" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">Confirm Password</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Lock className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={confirm} onChange={(e)=>setConfirm(e.target.value)} type="password" placeholder="••••••••" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Date of birth</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Calendar className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={dob} onChange={(e)=>setDob(e.target.value)} type="date" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">Country</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Globe className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={country} onChange={(e)=>setCountry(e.target.value)} placeholder="India" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Mobile</label>
+            <div className="flex items-center rounded-lg ring-1 ring-neutral-300 px-3">
+              <Phone className="mr-2 h-4 w-4 text-neutral-500" />
+              <input value={mobile} onChange={(e)=>setMobile(e.target.value)} placeholder="+91 98765 43210" className="h-10 w-full outline-none"/>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-2 flex items-center justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-lg border border-neutral-300 px-4 py-2">Close</button>
+          <button type="submit" className="rounded-lg px-4 py-2 text-white" style={{ backgroundColor: ACCENT }}>Submit</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ------------------------------ Page ---------------------------------------- */
+export default function GenealogyPage() {
   const [tree, setTree] = useState(initialTree);
-  const [selectedId, setSelectedId] = useState(tree.id);
-  const [scale, setScale] = useState(1);
+  const [selectedId, setSelectedId] = useState(initialTree.id);
+  const [modal, setModal] = useState({ open: false, parent: null, side: "left" });
+  const sel = useMemo(() => findNode(tree, selectedId), [tree, selectedId]);
 
-  // add-member dialog state
-  const [showAdd, setShowAdd] = useState(false);
-  const [candidateName, setCandidateName] = useState("");
-  const [leg, setLeg] = useState("Left"); // Left / Right
-  const [credentials, setCredentials] = useState(null); // {id, password}
-
-  const stats = useMemo(() => ([
-    { label: "Personal PV", value: "320", icon: Zap, tone: "bg-orange-100 text-orange-700" },
-    { label: "Team PV", value: "1,240", icon: TrendingUp, tone: "bg-emerald-100 text-emerald-700" },
-    { label: "Active Legs", value: "2", icon: ArrowLeftRight, tone: "bg-sky-100 text-sky-700" },
-    { label: "Rank", value: "Silver", icon: Crown, tone: "bg-amber-100 text-amber-700" },
-  ]), []);
-
-  // -------- utilities --------
-  const allIds = useMemo(() => {
-    const ids = new Set();
-    (function walk(n){ if(!n) return; ids.add(n.id); walk(n.left); walk(n.right); })(tree);
-    return ids;
-  }, [tree]);
-
-  function genId() {
-    // Unique-ish U + 6 digits; ensure not colliding with existing IDs
-    let id;
-    do { id = "U" + Math.floor(100000 + Math.random() * 900000); } while (allIds.has(id));
-    return id;
-  }
-  function genPassword(len = 10) {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$";
-    return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-  }
   function findNode(n, id) {
     if (!n) return null;
     if (n.id === id) return n;
     return findNode(n.left, id) || findNode(n.right, id);
   }
-  function clone(n) {
-    if (!n) return n;
-    return {
-      ...n,
-      left: clone(n.left),
-      right: clone(n.right),
-    };
+
+  function openAdd(parent, side) {
+    setModal({ open: true, parent, side });
   }
-  function addUnder(root, targetId, side, newNode) {
-    if (!root) return root;
-    const r = clone(root);
-    (function dfs(n) {
-      if (!n) return false;
-      if (n.id === targetId) {
-        if (side === "Left") {
-          if (n.left) throw new Error("Left leg already occupied.");
-          n.left = newNode;
-        } else {
-          if (n.right) throw new Error("Right leg already occupied.");
-          n.right = newNode;
-        }
-        return true;
-      }
-      return dfs(n.left) || dfs(n.right);
-    })(r);
-    return r;
-  }
-
-  const selectedNode = useMemo(() => findNode(tree, selectedId), [tree, selectedId]);
-  const leftFree  = !selectedNode?.left;
-  const rightFree = !selectedNode?.right;
-
-  function openAddDialog(whichLeg = "Left") {
-    setLeg(whichLeg);
-    setCandidateName("");
-    setShowAdd(true);
-  }
-
-  function handleAddSubmit(e) {
-    e?.preventDefault?.();
-    if (!candidateName.trim()) return;
-
-    const newID = genId();
-    const password = genPassword();
-
+  function createUser(payload) {
+    const ids = collectIds(tree);
+    const newId = genId(ids);
     const newNode = {
-      id: newID,
-      name: candidateName.trim(),
-      pv: 0,
-      rank: "—",
-      status: "New",
-      left: null,
-      right: null,
+      id: newId,
+      username: payload.username,
+      name: payload.name,
+      avatar: payload.avatar,
+      pv: 0, rank: "—", status: "New",
+      left: null, right: null,
     };
-
     try {
-      const updated = addUnder(tree, selectedId, leg, newNode);
+      const updated = addUnder(tree, modal.parent.id, modal.side, newNode);
       setTree(updated);
-      setShowAdd(false);
-      setCredentials({ id: newID, password });
-    } catch (err) {
-      alert(err.message);
+      setSelectedId(newId);
+      setModal({ open: false, parent: null, side: "left" });
+      // (Optional) you can show generated password somewhere:
+      // const tempPass = genPassword();
+    } catch (e) {
+      alert(e.message);
     }
   }
 
-  function copy(t) {
-    navigator.clipboard?.writeText(t);
-  }
-
   return (
-    <div className="min-h-[100svh] bg-neutral-50 text-neutral-900">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[260px_1fr]">
-        {/* Sidebar */}
-        <aside className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200 h-fit">
-          <div className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-md bg-orange-500 text-white">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 10l8-6 8 6M4 16l8-6 8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
+    <div className="min-h-[100svh] bg-neutral-50 px-3 mt-20 py-3 sm:px-4 sm:py-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-[270px_minmax(0,1fr)_320px]">
+        <Sidebar />
+
+        {/* Middle column */}
+        <main className="rounded-2xl bg-white p-3 ring-1 ring-neutral-200">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+            <div>
+              <h1 className="text-lg font-bold">Binary: Genealogy</h1>
+              <p className="text-sm text-neutral-600">
+                Click a node to view details. Use pan/zoom or the toolbar.
+              </p>
             </div>
-            <div className="font-extrabold">LAKSHRA</div>
+
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center rounded-xl bg-neutral-50 px-3 ring-1 ring-neutral-200">
+                <Search className="mr-2 h-4 w-4 text-neutral-500" />
+                <input placeholder="Search by username…" className="h-9 w-56 bg-transparent outline-none" />
+                <button className="ml-2 rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-semibold text-white">Search</button>
+                <button className="ml-2 rounded-lg border border-neutral-300 px-2 py-1.5 text-sm">Reset</button>
+              </div>
+            </div>
           </div>
 
-          <nav className="mt-6 space-y-1 text-[15px]">
-            <NavItem icon={LayoutDashboard} label="Overview" active />
-            <NavItem icon={TreePine} label="Genealogy Tree" />
-            <NavItem icon={ShoppingBag} label="Orders" />
-            <NavItem icon={Wallet} label="Wallet & Payouts" />
-            <NavItem icon={ReceiptText} label="Reports" />
-            <NavItem icon={Users} label="My Team" />
-            <NavItem icon={HelpCircle} label="Support" />
-          </nav>
+          <div className="mt-3">
+            <TreeCanvas
+              data={tree}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onAdd={openAdd}
+            />
+          </div>
+        </main>
 
-          <button className="mt-6 inline-flex w-full items-center gap-2 rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-semibold hover:bg-neutral-200">
-            <LogOut className="h-4 w-4" /> Sign out
-          </button>
-        </aside>
-
-        {/* Main */}
-        <section>
-          <header className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200">
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        {/* Right panel (details) */}
+        <aside className="space-y-3">
+          <div className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
+            <div className="flex items-center gap-3">
+              <div className="size-11 overflow-hidden rounded-full ring-2 ring-white shadow">
+                <img src={sel?.avatar} alt="" className="h-full w-full object-cover" />
+              </div>
               <div>
-                <h1 className="text-xl font-bold">Dashboard</h1>
-                <p className="text-sm text-neutral-600">
-                  Select a member on the tree, then add a recruit under Left or Right.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => openAddDialog("Left")}
-                  disabled={!leftFree}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold border ${leftFree ? "bg-white border-neutral-300 hover:bg-neutral-50" : "bg-neutral-100 border-neutral-200 text-neutral-400 cursor-not-allowed"}`}
-                >
-                  Add to Left
-                </button>
-                <button
-                  onClick={() => openAddDialog("Right")}
-                  disabled={!rightFree}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold border ${rightFree ? "bg-white border-neutral-300 hover:bg-neutral-50" : "bg-neutral-100 border-neutral-200 text-neutral-400 cursor-not-allowed"}`}
-                >
-                  Add to Right
-                </button>
-                <div className="rounded-xl bg-white px-3 py-2 ring-1 ring-neutral-200">
-                  <span className="mr-2 text-sm font-semibold">Zoom:</span>
-                  <input
-                    type="range"
-                    min="0.6"
-                    max="1.4"
-                    step="0.02"
-                    value={scale}
-                    onChange={(e) => setScale(parseFloat(e.target.value))}
-                  />
-                </div>
+                <div className="font-semibold leading-tight">{sel?.username}</div>
+                <div className="text-xs text-neutral-500">@{sel?.username?.split(" ").join("").toLowerCase()}</div>
               </div>
             </div>
-          </header>
 
-          {/* Stats */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200 shadow-sm">
-                <div className="flex items-center gap-2">
-                  <span className={`grid size-8 place-items-center rounded-lg ${s.tone}`}>
-                    <s.icon className="h-4 w-4" />
-                  </span>
-                  <div className="text-sm text-neutral-600">{s.label}</div>
-                </div>
-                <div className="mt-1 text-2xl font-bold">{s.value}</div>
-              </div>
-            ))}
-          </div>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+              <Info label="ID" value={sel?.id ?? "—"} />
+              <Info label="PV" value={sel?.pv ?? "—"} />
+              <Info label="RANK" value={sel?.rank ?? "—"} />
+              <Info label="STATUS" value={sel?.status ?? "—"} />
+              <Info label="DATE OF JOIN" value="—" />
+              <Info label="WEEKLY BV (LEFT)" value="—" />
+              <Info label="WEEKLY BV (RIGHT)" value="—" />
+              <Info label="TOTAL BV (LEFT)" value="—" />
+              <Info label="TOTAL BV (RIGHT)" value="—" />
+              <Info label="TOTAL LEFT USERS" value="—" />
+              <Info label="TOTAL RIGHT USERS" value="—" />
+            </div>
 
-          {/* Tree */}
-          <div className="mt-6 rounded-2xl bg-white p-3 ring-1 ring-neutral-200 shadow-sm">
-            <h2 className="px-2 pt-2 text-lg font-semibold">Binary Genealogy</h2>
-            <p className="px-2 pb-2 text-sm text-neutral-600">
-              Click a node to select it. Selected: <span className="font-semibold">{selectedNode?.name}</span>
-            </p>
-            <div className="relative h-[520px] overflow-auto rounded-xl bg-neutral-50 ring-1 ring-neutral-200">
-              <BinaryTree
-                root={tree}
-                scale={scale}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-              />
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <button
+                onClick={() => openAdd(sel, "left")}
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-50"
+              >
+                <ChevronLeft className="h-4 w-4" /> Add Left
+              </button>
+              <button
+                onClick={() => openAdd(sel, "right")}
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-50"
+              >
+                Add Right <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
-        </section>
+        </aside>
       </div>
 
-      {/* Add Member Dialog */}
-      {showAdd && (
-        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4">
-          <form
-            onSubmit={handleAddSubmit}
-            className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Add Member under {selectedNode?.name}</h3>
-              <button type="button" onClick={() => setShowAdd(false)} className="p-1 rounded hover:bg-neutral-100">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <label className="mt-4 block">
-              <span className="mb-1 block text-sm font-medium">Full name</span>
-              <input
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none"
-                placeholder="Enter name"
-                value={candidateName}
-                onChange={(e) => setCandidateName(e.target.value)}
-                autoFocus
-              />
-            </label>
-
-            <div className="mt-4">
-              <span className="mb-1 block text-sm font-medium">Placement leg</span>
-              <div className="flex items-center gap-2">
-                <button type="button"
-                  onClick={() => setLeg("Left")}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${leg==="Left"?"bg-neutral-900 text-white":"bg-neutral-100 hover:bg-neutral-200"}`}
-                  disabled={!leftFree}
-                >
-                  Left {leftFree ? "" : " (filled)"}
-                </button>
-                <button type="button"
-                  onClick={() => setLeg("Right")}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${leg==="Right"?"bg-neutral-900 text-white":"bg-neutral-100 hover:bg-neutral-200"}`}
-                  disabled={!rightFree}
-                >
-                  Right {rightFree ? "" : " (filled)"}
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={() => setShowAdd(false)} className="rounded-lg border border-neutral-300 px-3 py-2">
-                Cancel
-              </button>
-              <button type="submit" className="rounded-lg px-4 py-2 text-white" style={{ backgroundColor: ACCENT }}>
-                Add Member
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Credentials modal */}
-      {credentials && (
-        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Login credentials generated</h3>
-              <button className="p-1 rounded hover:bg-neutral-100" onClick={() => setCredentials(null)}>
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="mt-2 text-sm text-neutral-600">Share these with the new distributor. (You can change password after first login.)</p>
-
-            <div className="mt-4 rounded-xl bg-neutral-50 p-4 ring-1 ring-neutral-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-neutral-500">Login ID</div>
-                  <div className="font-mono text-lg">{credentials.id}</div>
-                </div>
-                <button className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 ring-1 ring-neutral-300"
-                        onClick={() => copy(credentials.id)}>
-                  <Copy className="h-4 w-4" /> Copy
-                </button>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-neutral-500">Temporary password</div>
-                  <div className="font-mono text-lg">{credentials.password}</div>
-                </div>
-                <button className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 ring-1 ring-neutral-300"
-                        onClick={() => copy(credentials.password)}>
-                  <Copy className="h-4 w-4" /> Copy
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-4 flex justify-end">
-              <button className="rounded-lg px-4 py-2 text-white" style={{ backgroundColor: ACCENT }}
-                      onClick={() => setCredentials(null)}>
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal */}
+      <AddUserModal
+        open={modal.open}
+        parent={modal.parent}
+        side={modal.side}
+        onClose={() => setModal({ open:false, parent:null, side:"left" })}
+        onCreate={createUser}
+      />
     </div>
   );
 }
 
-/* ---------- helpers ---------- */
-function NavItem({ icon: Icon, label, active }) {
+function Info({ label, value }) {
   return (
-    <a
-      href="#"
-      className={`flex items-center gap-2 rounded-xl px-3 py-2 ${
-        active ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
-      }`}
-    >
-      <Icon className="h-4 w-4" /> {label}
-    </a>
+    <div className="rounded-xl border border-neutral-200 px-3 py-2">
+      <div className="text-[11px] text-neutral-500">{label}</div>
+      <div className="font-semibold">{value}</div>
+    </div>
   );
 }

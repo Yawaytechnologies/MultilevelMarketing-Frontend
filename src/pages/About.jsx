@@ -9,7 +9,7 @@ import AboutCTA from "../components/about/AboutCTA";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-neutral-950 text-white mt-15">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         <AboutHero />
         <AboutMetrics />

@@ -11,21 +11,19 @@ import {
   Info,
 } from "lucide-react";
 
-const ACCENT = "#FF6B2B";
+const ACCENT = "#FF6B2B";          // primary brand
+const ACCENT_SOFT = "#FF8A50";     // lighter edge for gradients
 
 export default function JoinUs() {
   return (
-    <main className="bg-white text-neutral-900 mt-13">
-      {/* Header band that blends with your site colors */}
-      <section
-        className="relative"
-        aria-label="Join Us Intro"
-      >
+    <main className="text-neutral-900 mt-13 min-h-screen bg-gradient-to-b from-[#FFF2EC] via-white to-[#FFF8F5]">
+      {/* Header band with brand-tinted wash */}
+      <section className="relative" aria-label="Join Us Intro">
         <div
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "linear-gradient(180deg, rgba(255,107,43,0.10) 0%, rgba(255,255,255,0) 55%)",
+              "linear-gradient(180deg, rgba(255,107,43,0.12) 0%, rgba(255,107,43,0.06) 30%, rgba(255,255,255,0) 70%)",
           }}
         />
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
@@ -37,7 +35,8 @@ export default function JoinUs() {
             </span>
 
             <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Choose how you want to be part of <span style={{ color: ACCENT }}>LAKSHRA</span>
+              Choose how you want to be part of{" "}
+              <span style={{ color: ACCENT }}>LAKSHRA</span>
             </h1>
 
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
@@ -55,9 +54,8 @@ export default function JoinUs() {
               Explore Products
             </a>
             <a
-              href="/joinus"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white"
-              style={{ backgroundColor: ACCENT }}
+              href="/distributor/login"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 bg-gradient-to-r from-[#FF6B2B] to-[#FF8A50]"
             >
               Join as a Distributor
               <ArrowRight className="h-4 w-4" />
@@ -98,12 +96,12 @@ export default function JoinUs() {
             ctas={[
               {
                 label: "Join Now",
-                href: "/signup?role=vip",
+                href: "/distributor/login",
                 variant: "accent",
               },
               {
                 label: "Learn More",
-                href: "/vip",
+                href: "/contact",
                 variant: "ghost",
               },
             ]}
@@ -138,12 +136,12 @@ export default function JoinUs() {
             ctas={[
               {
                 label: "Join Now",
-                href: "/signup?role=partner",
+                href: "/distributor/login",
                 variant: "accent",
               },
               {
                 label: "Learn More",
-                href: "/opportunity",
+                href: "/contact",
                 variant: "ghost",
               },
             ]}
@@ -173,63 +171,69 @@ export default function JoinUs() {
 
 function PlanCard({ id, title, tagline, icon, features, ctas }) {
   return (
-    <section
-      id={id}
-      className="rounded-2xl bg-white p-6 sm:p-8 ring-1 ring-neutral-200 shadow-sm"
-    >
-      {/* header */}
-      <div className="flex items-start gap-3">
-        <div
-          className="grid h-10 w-10 place-items-center rounded-lg"
-          style={{ backgroundColor: "#FF6B2B1A", color: ACCENT }}
-        >
-          {icon}
+    // gradient border wrapper
+    <div className="rounded-2xl p-[1px] bg-gradient-to-br from-[#FF6B2B33] via-[#FF8A501A] to-transparent shadow-sm">
+      <section
+        id={id}
+        className="rounded-2xl bg-white p-6 sm:p-8 ring-1 ring-neutral-200"
+      >
+        {/* header */}
+        <div className="flex items-start gap-3">
+          <div
+            className="grid h-10 w-10 place-items-center rounded-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,107,43,0.15), rgba(255,138,80,0.15))",
+              color: ACCENT,
+            }}
+          >
+            {icon}
+          </div>
+          <div>
+            <h3 className="text-xl sm:text-2xl font-extrabold">{title}</h3>
+            <p className="mt-1 text-sm font-medium text-neutral-600">{tagline}</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-xl sm:text-2xl font-extrabold">{title}</h3>
-          <p className="mt-1 text-sm font-medium text-neutral-600">{tagline}</p>
+
+        {/* features */}
+        <ul className="mt-5 space-y-4">
+          {features.map((f, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <span className="mt-1 grid h-7 w-7 place-items-center rounded-md bg-neutral-100 text-neutral-700">
+                {f.icon}
+              </span>
+              <div>
+                <div className="font-semibold">{f.title}</div>
+                <p className="text-sm text-neutral-600">{f.desc}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* CTAs */}
+        <div className="mt-6 flex flex-wrap gap-3">
+          {ctas.map((b) =>
+            b.variant === "accent" ? (
+              <a
+                key={b.label}
+                href={b.href}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 bg-gradient-to-r from-[#FF6B2B] to-[#FF8A50]"
+              >
+                {b.label}
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            ) : (
+              <a
+                key={b.label}
+                href={b.href}
+                className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold hover:bg-neutral-50"
+              >
+                {b.label}
+              </a>
+            )
+          )}
         </div>
-      </div>
-
-      {/* features */}
-      <ul className="mt-5 space-y-4">
-        {features.map((f, i) => (
-          <li key={i} className="flex items-start gap-3">
-            <span className="mt-1 grid h-7 w-7 place-items-center rounded-md bg-neutral-100 text-neutral-700">
-              {f.icon}
-            </span>
-            <div>
-              <div className="font-semibold">{f.title}</div>
-              <p className="text-sm text-neutral-600">{f.desc}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {/* CTAs */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        {ctas.map((b) =>
-          b.variant === "accent" ? (
-            <a
-              key={b.label}
-              href={b.href}
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
-              style={{ backgroundColor: ACCENT }}
-            >
-              {b.label}
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          ) : (
-            <a
-              key={b.label}
-              href={b.href}
-              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold hover:bg-neutral-50"
-            >
-              {b.label}
-            </a>
-          )
-        )}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
