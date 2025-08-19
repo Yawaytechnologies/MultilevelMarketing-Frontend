@@ -37,7 +37,7 @@ export default function ContactPage() {
   const toggleFaq = (id) => setOpenFaq((prev) => (prev === id ? "" : id));
 
   return (
-    <main className="min-h-screen bg-[#0a0b0d] text-white selection:bg-orange-300/20">
+    <main className="min-h-screen bg-[#0a0b0d] text-white selection:bg-orange-300/20 mt-15">
       {/* background accents */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute right-[-8rem] top-10 h-[34rem] w-[34rem] rounded-full bg-orange-500/20 blur-3xl" />
