@@ -123,10 +123,7 @@ function genId(existing) {
   } while (existing.has(id));
   return id;
 }
-function genPassword(len = 10) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$";
-  return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
+
 
 /** Pure functional insert: add under targetId on 'left' or 'right'. */
 function addUnder(root, targetId, side, node) {
@@ -155,14 +152,15 @@ function addUnder(root, targetId, side, node) {
 const ACCENT = "#FF6B2B";
 
 function Sidebar() {
-  const Item = ({ icon: Icon, label, active }) => (
+  // Now Item just takes children (icon) and label
+  const Item = ({ label, active, children }) => (
     <a
       href="#"
       className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[15px] ${
         active ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
       }`}
     >
-      <Icon className="h-4 w-4" />
+      {children}
       {label}
     </a>
   );
@@ -179,13 +177,27 @@ function Sidebar() {
       </div>
 
       <nav className="mt-6 space-y-1">
-        <Item icon={LayoutDashboard} label="Dashboard" />
-        <Item icon={ShoppingBag} label="Business" />
-        <Item icon={TreePine} label="Genealogy" active />
-        <Item icon={Wallet} label="Financial" />
-        <Item icon={ReceiptText} label="Reports" />
-        <Item icon={Users} label="Members" />
-        <Item icon={HelpCircle} label="Support" />
+        <Item label="Dashboard" active>
+          <LayoutDashboard className="h-4 w-4" />
+        </Item>
+        <Item label="Business">
+          <ShoppingBag className="h-4 w-4" />
+        </Item>
+        <Item label="Genealogy">
+          <TreePine className="h-4 w-4" />
+        </Item>
+        <Item label="Financial">
+          <Wallet className="h-4 w-4" />
+        </Item>
+        <Item label="Reports">
+          <ReceiptText className="h-4 w-4" />
+        </Item>
+        <Item label="Members">
+          <Users className="h-4 w-4" />
+        </Item>
+        <Item label="Support">
+          <HelpCircle className="h-4 w-4" />
+        </Item>
       </nav>
 
       <button className="mt-6 inline-flex w-full items-center gap-2 rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-semibold hover:bg-neutral-200">
@@ -194,6 +206,7 @@ function Sidebar() {
     </aside>
   );
 }
+
 
 function NodeCard({ node, selectedId, onSelect }) {
   const selected = selectedId === node.id;
