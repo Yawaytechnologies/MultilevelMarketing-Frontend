@@ -35,7 +35,7 @@ export default function ProductPage() {
   return (
     // ↓ dark shell
     <div className="bg-slate-950 text-slate-100">
-      <title>Products | Direct Selling • Wellness • Beauty • Home Care</title>
+      <title>Lakshra | Products </title>
       <meta
         name="description"
         content="Discover premium wellness, nutrition, beauty and home care products. Earn PV/BV on purchases, unlock distributor pricing, and grow with our direct selling opportunity."

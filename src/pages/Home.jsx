@@ -9,6 +9,11 @@ import OurStory from "../components/home/OurStory";
 export default function Home() {
   return (
     <>
+    <title>Lakshra | Home </title>
+      <meta
+        name="description"
+        content="Discover premium wellness, nutrition, beauty and home care products. Earn PV/BV on purchases, unlock distributor pricing, and grow with our direct selling opportunity."
+      />
       <Hero />
       {/* attaches under hero; sticks to top when reached */}
       <Header mode="sticky" />

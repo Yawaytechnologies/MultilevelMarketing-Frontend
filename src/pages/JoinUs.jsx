@@ -17,6 +17,11 @@ const ACCENT_SOFT = "#FF8A50";     // lighter edge for gradients
 export default function JoinUs() {
   return (
     <main className="text-neutral-900 mt-13 min-h-screen bg-gradient-to-b from-[#FFF2EC] via-white to-[#FFF8F5]">
+      <title>Lakshra | Joinus </title>
+      <meta
+        name="description"
+        content="Discover premium wellness, nutrition, beauty and home care products. Earn PV/BV on purchases, unlock distributor pricing, and grow with our direct selling opportunity."
+      />
       {/* Header band with brand-tinted wash */}
       <section className="relative" aria-label="Join Us Intro">
         <div

@@ -10,6 +10,11 @@ import AboutCTA from "../components/about/AboutCTA";
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white mt-15">
+      <title>Lakshra | About </title>
+      <meta
+        name="description"
+        content="Discover premium wellness, nutrition, beauty and home care products. Earn PV/BV on purchases, unlock distributor pricing, and grow with our direct selling opportunity."
+      />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         <AboutHero />
         <AboutMetrics />

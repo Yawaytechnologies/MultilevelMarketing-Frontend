@@ -38,6 +38,11 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen bg-[#0a0b0d] text-white selection:bg-orange-300/20 mt-15">
+      <title>Lakshra | Contact </title>
+      <meta
+        name="description"
+        content="Discover premium wellness, nutrition, beauty and home care products. Earn PV/BV on purchases, unlock distributor pricing, and grow with our direct selling opportunity."
+      />
       {/* background accents */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute right-[-8rem] top-10 h-[34rem] w-[34rem] rounded-full bg-orange-500/20 blur-3xl" />
